@@ -11,7 +11,7 @@ def main(page: ft.Page):
     color_primario = ft.Colors.BLUE_900
     
     # --- CONFIGURACIÓN ---
-    CLAVE_ACCESO = "dorrego2026"
+    CLAVE_ACCESO = "ce"
     archivo = "lista.txt"
     datos_escuelas = []
     
@@ -151,3 +151,4 @@ def main(page: ft.Page):
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8080))
     ft.run(main, host="0.0.0.0", port=port, view=ft.AppView.WEB_BROWSER)
+

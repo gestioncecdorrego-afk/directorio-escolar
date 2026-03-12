@@ -48,20 +48,14 @@ def main(page: ft.Page):
                 if len(partes) >= 4:
                     n, l, d, t = [p.strip() for p in partes]
                     
-                    # Criterio de búsqueda: por nombre, director, localidad o versión limpia
                     if (val_original in n.lower() or 
                         val_original in d.lower() or 
                         val_original in l.lower() or
                         val_limpio in normalizar(n)):
                         
                         encontrado = True
-                        # Limpiar teléfono para el botón llamar
                         tel_f = "".join(filter(str.isdigit, t))
-                        
-                        # URL de Mapa (Búsqueda directa en Google Maps)
                         url_mapa = f"https://www.google.com/maps/search/{n.replace(' ', '+')}+{l.replace(' ', '+')}+Coronel+Dorrego"
-                        
-                        # Mensaje para compartir por WhatsApp
                         texto_ws = f"📍 *{n}*\nLocalidad: {l}\nDirector: {d}\nTel: {t}"
                         url_ws = f"https://wa.me/?text={texto_ws.replace(' ', '%20')}"
 
@@ -86,7 +80,6 @@ def main(page: ft.Page):
                 lista_resultados.controls.append(ft.Text("No se encontraron escuelas.", color="red", italic=True))
         page.update()
 
-    # --- VISTA PRINCIPAL (BUSCADOR) ---
     btn_tema = ft.IconButton(ft.Icons.DARK_MODE, on_click=cambiar_tema)
     
     txt_busqueda = ft.TextField(
@@ -119,7 +112,6 @@ def main(page: ft.Page):
         lista_resultados
     ], scroll=ft.ScrollMode.AUTO)
 
-    # --- VISTA DE LOGIN ---
     def verificar_clave(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
@@ -149,9 +141,13 @@ def main(page: ft.Page):
         ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER),
     )
 
-    # Iniciar con el Login
     page.add(vista_login)
 
+# --- ESTO ES LO QUE CAMBIAMOS PARA RENDER ---
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8080))
-    ft.run(main, host="0.0.0.0", port=port, view=ft.AppView.WEB_BROWSER)
+    # Usamos ft.app en lugar de ft.run para la web
+    ft.app(
+        target=main,
+        view=ft.AppView.WEB_BROWSER,
+        port=int(os.getenv("PORT", 8080))
+    )

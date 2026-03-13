@@ -50,21 +50,20 @@ def main(page: ft.Page):
                         texto_ws = f"*{n}*\nLocalidad: {l}\nDirector: {d}\nTel: {t}"
                         url_ws = f"https://wa.me/?text={texto_ws.replace(' ', '%20')}"
 
-                        # Usamos colores básicos en texto para evitar errores de versión
                         lista_resultados.controls.append(
                             ft.Container(
                                 padding=20, 
                                 border_radius=15, 
-                                bgcolor="grey100", # Color básico
+                                bgcolor="grey100",
                                 border=ft.border.all(1, "grey400"),
                                 content=ft.Column([
                                     ft.Text(n, size=18, weight="bold", color="blue700"),
                                     ft.Text(f"📍 {l}", size=15, color="black"),
                                     ft.Text(f"👤 Dir: {d}", size=14, italic=True, color="black"),
                                     ft.Row([
-                                        ft.IconButton(ft.icons.SHARE, icon_color="blue", url=url_ws),
-                                        ft.FilledButton("Llamar", icon=ft.icons.PHONE, url=f"tel:{tel_f}", bgcolor="green700"),
-                                        ft.FilledButton("Mapa", icon=ft.icons.MAP, url=url_mapa, bgcolor="red700"),
+                                        ft.IconButton(icon="share", icon_color="blue", url=url_ws),
+                                        ft.FilledButton("Llamar", icon="phone", url=f"tel:{tel_f}", bgcolor="green700"),
+                                        ft.FilledButton("Mapa", icon="map", url=url_mapa, bgcolor="red700"),
                                     ], alignment=ft.MainAxisAlignment.END)
                                 ])
                             )
@@ -76,7 +75,7 @@ def main(page: ft.Page):
     txt_busqueda = ft.TextField(
         label="Buscar escuela o director...", 
         on_change=actualizar_lista, 
-        prefix_icon=ft.icons.SEARCH,
+        prefix_icon="search", # Cambiado a texto simple
         border_radius=15,
         filled=True
     )
@@ -112,7 +111,7 @@ def main(page: ft.Page):
         ft.Container(
             expand=True,
             content=ft.Column([
-                ft.Icon(ft.icons.LOCK_PERSON, size=80, color="blue"),
+                ft.Icon(name="lock_person", size=80, color="blue"), # Cambiado a texto simple
                 ft.Text("Acceso Restringido", size=22, weight="bold"),
                 txt_clave,
                 ft.FilledButton("Entrar", on_click=verificar_clave, width=200)

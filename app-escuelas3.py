@@ -5,10 +5,8 @@ import re
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
-    # Quitamos alineaciones centradas que causan el error gris
-    page.vertical_alignment = "start"
-    page.horizontal_alignment = "start"
-    page.padding = 20
+    page.scroll = "auto"
+    page.padding = 15
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -36,30 +34,44 @@ def main(page: ft.Page):
                         inst, loc, dir, tel = [p.strip() for p in partes[:4]]
                         tel_limpio = "".join(filter(str.isdigit, tel))
                         
+                        # Recuperamos el diseño de tarjetas con botones
                         lista_resultados.controls.append(
                             ft.Container(
-                                padding=15, bgcolor="#F0F4F8", border_radius=10,
+                                padding=15, 
+                                bgcolor="white", 
+                                border_radius=12,
+                                border=ft.border.all(1, "#E1E1E1"),
+                                shadow=ft.BoxShadow(blur_radius=4, color="grey300"),
                                 content=ft.Column([
-                                    ft.Text(inst, size=18, weight="bold", color="blue"),
-                                    ft.Text(f"📍 {loc} | 👤 {dir}", size=14),
+                                    ft.Text(inst, size=18, weight="bold", color="blue700"),
+                                    ft.Text(f"📍 {loc}", size=14, color="black"),
+                                    ft.Text(f"👤 Dir: {dir}", size=13, italic=True, color="grey700"),
                                     ft.Row([
-                                        ft.ElevatedButton("Llamar", icon="phone", bgcolor="green", color="white", url=f"tel:{tel_limpio}"),
-                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red", color="white", url=f"http://google.com/maps/search/{inst.replace(' ', '+')}+{loc.replace(' ', '+')}"),
-                                    ], alignment="end")
+                                        # Botones con colores como al principio
+                                        ft.ElevatedButton("WhatsApp", icon="share", bgcolor="blue", color="white", url=f"https://wa.me/?text=Escuela:%20{inst}%0ADir:%20{dir}%0ATel:%20{tel}"),
+                                        ft.ElevatedButton("Llamar", icon="phone", bgcolor="green700", color="white", url=f"tel:{tel_limpio}"),
+                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red700", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}+{loc.replace(' ', '+')}"),
+                                    ], alignment="end", wrap=True)
                                 ])
                             )
                         )
         page.update()
 
-    txt_busqueda = ft.TextField(label="Buscar...", on_change=actualizar_lista, border_radius=10, prefix_icon="search")
+    txt_busqueda = ft.TextField(
+        label="Buscar institución o director...", 
+        on_change=actualizar_lista, 
+        border_radius=15, 
+        prefix_icon="search",
+        filled=True
+    )
 
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
             page.add(
-                ft.Text("Directorio Escolar", size=24, weight="bold", color="blue"),
-                ft.Text("Consejo Escolar Dorrego", size=12),
-                ft.Divider(),
+                ft.Text("Directorio Escolar", size=26, weight="bold", color="blue800"),
+                ft.Text("Consejo Escolar Coronel Dorrego", size=13, color="grey600"),
+                ft.Divider(height=20),
                 txt_busqueda,
                 lista_resultados
             )
@@ -68,17 +80,24 @@ def main(page: ft.Page):
             txt_clave.error_text = "Clave incorrecta"
             page.update()
 
-    # Login simple al principio de la página para que se vea en el celu
-    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=300)
+    # Login visualmente más limpio
+    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=280, text_align="center")
     
     page.add(
-        ft.Column([
-            ft.Icon("lock", size=40, color="blue"),
-            ft.Text("Ingresar Clave", size=18, weight="bold"),
-            txt_clave,
-            ft.ElevatedButton("Entrar", on_click=entrar, width=200)
-        ], horizontal_alignment="center")
+        ft.Container(
+            padding=50,
+            content=ft.Column([
+                ft.Icon("lock_outline", size=60, color="blue800"),
+                ft.Text("Acceso Restringido", size=22, weight="bold"),
+                txt_clave,
+                ft.FilledButton("Entrar", on_click=entrar, width=200)
+            ], horizontal_alignment="center")
+        )
     )
 
 if __name__ == "__main__":
-    ft.app(target=main, port=int(os.getenv("PORT", 8080)))
+    ft.app(
+        target=main, 
+        port=int(os.getenv("PORT", 8080)),
+        web_renderer=ft.WebRenderer.HTML # Soluciona el problema de la pantalla gris en móviles
+    )

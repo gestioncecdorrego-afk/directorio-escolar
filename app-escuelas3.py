@@ -5,9 +5,9 @@ import re
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
-    # Forzamos a que la página no intente centrar nada, que empiece arriba
-    page.vertical_alignment = ft.MainAxisAlignment.START
-    page.padding = 10
+    # Alineación al inicio (arriba) para evitar el espacio gris
+    page.vertical_alignment = "start" 
+    page.padding = 20
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -21,7 +21,7 @@ def main(page: ft.Page):
         if not t: return ""
         return "".join(re.findall(r'[a-z0-9]', t.lower()))
 
-    lista_resultados = ft.ListView(expand=True, spacing=15, height=500)
+    lista_resultados = ft.ListView(expand=True, spacing=15)
 
     def actualizar_lista(e):
         lista_resultados.controls.clear()
@@ -57,13 +57,10 @@ def main(page: ft.Page):
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
-            # Agregamos todo dentro de una columna para asegurar el orden
             page.add(
-                ft.Column([
-                    ft.Text("Directorio Escolar", size=22, weight="bold"),
-                    txt_busqueda,
-                    lista_resultados
-                ], scroll=ft.ScrollMode.ADAPTIVE)
+                ft.Text("Directorio Escolar", size=22, weight="bold"),
+                txt_busqueda,
+                lista_resultados
             )
             page.update()
         else:
@@ -72,20 +69,15 @@ def main(page: ft.Page):
 
     txt_clave = ft.TextField(label="Clave", password=True, on_submit=entrar, width=250)
     
-    # El truco: Ponemos el login dentro de un contenedor arriba de todo
+    # Usamos una forma de alineación que Flet 0.82+ siempre acepta
     page.add(
-        ft.Container(
-            content=ft.Column([
-                ft.Icon("lock", size=40, color="blue"),
-                ft.Text("Ingresar Clave", weight="bold"),
-                txt_clave,
-                ft.ElevatedButton("Entrar", on_click=entrar)
-            ], horizontal_alignment="center"),
-            alignment=ft.alignment.top_center,
-            padding=20
-        )
+        ft.Column([
+            ft.Icon("lock", size=40, color="blue"),
+            ft.Text("Ingresar Clave", weight="bold"),
+            txt_clave,
+            ft.ElevatedButton("Entrar", on_click=entrar)
+        ], horizontal_alignment="center")
     )
 
 if __name__ == "__main__":
     ft.app(target=main, port=int(os.getenv("PORT", 8080)))
-    

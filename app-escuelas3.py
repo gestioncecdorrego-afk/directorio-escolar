@@ -61,7 +61,7 @@ def main(page: ft.Page):
                                     ft.Text(f"📍 {l}", size=15, color="black"),
                                     ft.Text(f"👤 Dir: {d}", size=14, italic=True, color="black"),
                                     ft.Row([
-                                        ft.IconButton(icon="share", icon_color="blue", url=url_ws),
+                                        ft.IconButton("share", icon_color="blue", url=url_ws),
                                         ft.FilledButton("Llamar", icon="phone", url=f"tel:{tel_f}", bgcolor="green700"),
                                         ft.FilledButton("Mapa", icon="map", url=url_mapa, bgcolor="red700"),
                                     ], alignment=ft.MainAxisAlignment.END)
@@ -75,7 +75,7 @@ def main(page: ft.Page):
     txt_busqueda = ft.TextField(
         label="Buscar escuela o director...", 
         on_change=actualizar_lista, 
-        prefix_icon="search", # Cambiado a texto simple
+        prefix_icon="search",
         border_radius=15,
         filled=True
     )
@@ -111,7 +111,7 @@ def main(page: ft.Page):
         ft.Container(
             expand=True,
             content=ft.Column([
-                ft.Icon(name="lock_person", size=80, color="blue"), # Cambiado a texto simple
+                ft.Icon("lock_person", size=80, color="blue"),
                 ft.Text("Acceso Restringido", size=22, weight="bold"),
                 txt_clave,
                 ft.FilledButton("Entrar", on_click=verificar_clave, width=200)

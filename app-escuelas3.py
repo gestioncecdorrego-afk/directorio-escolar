@@ -5,6 +5,7 @@ def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
     page.scroll = "auto"
+    page.padding = 20
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -14,7 +15,7 @@ def main(page: ft.Page):
         with open(archivo, "r", encoding="utf-8", errors="ignore") as f:
             datos_escuelas = [linea.strip() for linea in f if linea.strip()]
 
-    lista_resultados = ft.ListView(expand=True, spacing=10)
+    lista_resultados = ft.ListView(expand=True, spacing=15)
 
     def actualizar_lista(e):
         lista_resultados.controls.clear()
@@ -24,30 +25,79 @@ def main(page: ft.Page):
                 if busqueda in linea.lower():
                     partes = linea.split("-")
                     if len(partes) >= 4:
-                        n, l, d, t = partes[0], partes[1], partes[2], partes[3]
+                        n, l, d, t = partes[0].strip(), partes[1].strip(), partes[2].strip(), partes[3].strip()
+                        
+                        # Limpiamos el teléfono para la función de llamar
+                        tel_limpio = "".join(filter(str.isdigit, t))
+                        # Link de Google Maps
+                        url_mapa = f"https://www.google.com/maps/search/{n.replace(' ', '+')}+{l.replace(' ', '+')}"
+
                         lista_resultados.controls.append(
-                            ft.ListTile(
-                                title=ft.Text(n, weight="bold"),
-                                subtitle=ft.Text(f"{l} - Dir: {d}"),
-                                trailing=ft.Text(t),
-                                on_click=lambda _: None
+                            ft.Container(
+                                padding=15,
+                                bgcolor="white",
+                                border_radius=10,
+                                border=ft.border.all(1, "#E1E1E1"),
+                                content=ft.Column([
+                                    ft.Text(n, size=18, weight="bold", color="blue"),
+                                    ft.Text(f"📍 {l}", size=14),
+                                    ft.Text(f"👤 Dir: {d}", size=13, italic=True),
+                                    ft.Row([
+                                        ft.ElevatedButton(
+                                            "Llamar", 
+                                            icon="phone", 
+                                            bgcolor="green", 
+                                            color="white",
+                                            url=f"tel:{tel_limpio}"
+                                        ),
+                                        ft.ElevatedButton(
+                                            "Mapa", 
+                                            icon="map", 
+                                            bgcolor="red", 
+                                            color="white",
+                                            url=url_mapa
+                                        ),
+                                    ], alignment="end")
+                                ])
                             )
                         )
         page.update()
 
-    txt_busqueda = ft.TextField(label="Buscar escuela...", on_change=actualizar_lista)
+    txt_busqueda = ft.TextField(
+        label="Buscar escuela o director...", 
+        on_change=actualizar_lista,
+        border_radius=10,
+        prefix_icon="search"
+    )
 
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
-            page.add(ft.Text("Directorio Escolar", size=25, weight="bold"), txt_busqueda, lista_resultados)
+            page.add(
+                ft.Text("Directorio Escolar", size=28, weight="bold", color="blue"),
+                ft.Text("Consejo Escolar Coronel Dorrego", size=14),
+                ft.Divider(height=20),
+                txt_busqueda,
+                lista_resultados
+            )
             page.update()
         else:
-            txt_clave.error_text = "Incorrecta"
+            txt_clave.error_text = "Clave incorrecta"
             page.update()
 
-    txt_clave = ft.TextField(label="Clave", password=True, on_submit=entrar)
-    page.add(ft.Text("Ingresar Clave"), txt_clave, ft.ElevatedButton("Entrar", on_click=entrar))
+    # Pantalla de Login mejorada
+    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=300)
+    page.add(
+        ft.Container(
+            expand=True,
+            content=ft.Column([
+                ft.Icon("lock", size=50, color="blue"),
+                ft.Text("Acceso Restringido", size=20, weight="bold"),
+                txt_clave,
+                ft.ElevatedButton("Entrar", on_click=entrar, width=200)
+            ], horizontal_alignment="center", alignment="center")
+        )
+    )
 
 if __name__ == "__main__":
     ft.app(target=main, port=int(os.getenv("PORT", 8080)))

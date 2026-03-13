@@ -6,6 +6,7 @@ def main(page: ft.Page):
     page.title = "Directorio Escolar - C. Dorrego"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.scroll = ft.ScrollMode.AUTO
+    page.padding = 20
     
     # --- CONFIGURACIÓN ---
     CLAVE_ACCESO = "dorrego2026"
@@ -32,7 +33,7 @@ def main(page: ft.Page):
 
     def filtrar_por_categoria(e):
         """Al tocar un Chip, se escribe en el buscador y se filtra"""
-        txt_busqueda.value = e.control.label.value
+        txt_busqueda.value = e.control.label
         actualizar_lista(None)
         page.update()
 
@@ -64,6 +65,7 @@ def main(page: ft.Page):
                                 padding=20, border_radius=15, 
                                 bgcolor=ft.Colors.SURFACE_VARIANT,
                                 border=ft.Border.all(1, ft.Colors.OUTLINE_VARIANT),
+                                shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
                                 content=ft.Column([
                                     ft.Text(n, size=18, weight="bold", color=ft.Colors.PRIMARY),
                                     ft.Text(f"📍 {l}", size=15),
@@ -91,13 +93,14 @@ def main(page: ft.Page):
         hint_text="Ej: ep1, jin2, ees1..."
     )
 
+    # Chips con colores y corregidos
     chips_categorias = ft.Row([
-        ft.Chip(label=ft.Text("EP"), on_click=filtrar_por_categoria),
-        ft.Chip(label=ft.Text("JI"), on_click=filtrar_por_categoria),
-        ft.Chip(label=ft.Text("EES"), on_click=filtrar_por_categoria),
-        ft.Chip(label=ft.Text("CEC"), on_click=filtrar_por_categoria),
+        ft.Chip(label="EP", on_click=filtrar_por_categoria, bgcolor=ft.Colors.BLUE_50, label_style=ft.TextStyle(color=ft.Colors.BLUE_800, weight="bold")),
+        ft.Chip(label="JI", on_click=filtrar_por_categoria, bgcolor=ft.Colors.GREEN_50, label_style=ft.TextStyle(color=ft.Colors.GREEN_800, weight="bold")),
+        ft.Chip(label="EES", on_click=filtrar_por_categoria, bgcolor=ft.Colors.ORANGE_50, label_style=ft.TextStyle(color=ft.Colors.ORANGE_800, weight="bold")),
+        ft.Chip(label="CEC", on_click=filtrar_por_categoria, bgcolor=ft.Colors.PURPLE_50, label_style=ft.TextStyle(color=ft.Colors.PURPLE_800, weight="bold")),
     ], wrap=True, alignment=ft.MainAxisAlignment.CENTER)
-   
+
     vista_busqueda = ft.Column([
         ft.Row([
             ft.Column([
@@ -115,7 +118,7 @@ def main(page: ft.Page):
     def verificar_clave(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
-            page.add(ft.SafeArea(ft.Container(content=vista_busqueda, padding=15)))
+            page.add(ft.SafeArea(ft.Container(content=vista_busqueda, padding=10)))
             page.update()
         else:
             txt_clave.error_text = "Clave incorrecta"
@@ -143,12 +146,9 @@ def main(page: ft.Page):
 
     page.add(vista_login)
 
-# --- ESTO ES LO QUE CAMBIAMOS PARA RENDER ---
 if __name__ == "__main__":
-    # Usamos ft.app en lugar de ft.run para la web
     ft.app(
         target=main,
         view=ft.AppView.WEB_BROWSER,
         port=int(os.getenv("PORT", 8080))
     )
-

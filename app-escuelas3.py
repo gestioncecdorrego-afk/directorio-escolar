@@ -5,8 +5,9 @@ import re
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
-    page.scroll = "auto"
-    page.padding = 15
+    # Forzamos a que la página no intente centrar nada, que empiece arriba
+    page.vertical_alignment = ft.MainAxisAlignment.START
+    page.padding = 10
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -20,16 +21,16 @@ def main(page: ft.Page):
         if not t: return ""
         return "".join(re.findall(r'[a-z0-9]', t.lower()))
 
-    lista_resultados = ft.ListView(expand=True, spacing=15)
+    lista_resultados = ft.ListView(expand=True, spacing=15, height=500)
 
     def actualizar_lista(e):
         lista_resultados.controls.clear()
-        busqueda_original = txt_busqueda.value.lower().strip()
-        busqueda_limpia = normalizar(busqueda_original)
+        busq_orig = txt_busqueda.value.lower().strip()
+        busq_limp = normalizar(busq_orig)
         
-        if busqueda_original:
+        if busq_orig:
             for linea in datos_escuelas:
-                if busqueda_original in linea.lower() or busqueda_limpia in normalizar(linea):
+                if busq_orig in linea.lower() or busq_limp in normalizar(linea):
                     partes = linea.split("-")
                     if len(partes) >= 4:
                         inst, loc, dir, tel = [p.strip() for p in partes[:4]]
@@ -37,62 +38,54 @@ def main(page: ft.Page):
                         
                         lista_resultados.controls.append(
                             ft.Container(
-                                padding=15, 
-                                bgcolor="white", 
-                                border_radius=12,
+                                padding=15, bgcolor="white", border_radius=10,
                                 border=ft.border.all(1, "#E1E1E1"),
-                                shadow=ft.BoxShadow(blur_radius=4, color="grey300"),
                                 content=ft.Column([
-                                    ft.Text(inst, size=18, weight="bold", color="blue700"),
-                                    ft.Text(f"📍 {loc}", size=14, color="black"),
-                                    ft.Text(f"👤 Dir: {dir}", size=13, italic=True, color="grey700"),
+                                    ft.Text(inst, size=16, weight="bold", color="blue700"),
+                                    ft.Text(f"📍 {loc} | Dir: {dir}", size=13),
                                     ft.Row([
-                                        ft.ElevatedButton("WhatsApp", icon="share", bgcolor="blue", color="white", url=f"https://wa.me/?text=Escuela:%20{inst}%0ADir:%20{dir}%0ATel:%20{tel}"),
-                                        ft.ElevatedButton("Llamar", icon="phone", bgcolor="green700", color="white", url=f"tel:{tel_f}"),
-                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red700", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}+{loc.replace(' ', '+')}"),
-                                    ], alignment="end", wrap=True)
+                                        ft.ElevatedButton("📞", bgcolor="green", color="white", url=f"tel:{tel_f}", width=60),
+                                        ft.ElevatedButton("🗺️", bgcolor="red", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}", width=60),
+                                    ], alignment="end")
                                 ])
                             )
                         )
         page.update()
 
-    txt_busqueda = ft.TextField(
-        label="Buscar...", 
-        on_change=actualizar_lista, 
-        border_radius=15, 
-        prefix_icon="search",
-        filled=True
-    )
+    txt_busqueda = ft.TextField(label="Buscar...", on_change=actualizar_lista, border_radius=10)
 
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
+            # Agregamos todo dentro de una columna para asegurar el orden
             page.add(
-                ft.Text("Directorio Escolar", size=26, weight="bold", color="blue800"),
-                ft.Text("Consejo Escolar Coronel Dorrego", size=13),
-                ft.Divider(height=20),
-                txt_busqueda,
-                lista_resultados
+                ft.Column([
+                    ft.Text("Directorio Escolar", size=22, weight="bold"),
+                    txt_busqueda,
+                    lista_resultados
+                ], scroll=ft.ScrollMode.ADAPTIVE)
             )
             page.update()
         else:
-            txt_clave.error_text = "Clave incorrecta"
+            txt_clave.error_text = "Incorrecta"
             page.update()
 
-    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=280, text_align="center")
+    txt_clave = ft.TextField(label="Clave", password=True, on_submit=entrar, width=250)
     
+    # El truco: Ponemos el login dentro de un contenedor arriba de todo
     page.add(
         ft.Container(
-            padding=50,
             content=ft.Column([
-                ft.Icon("lock_outline", size=60, color="blue800"),
-                ft.Text("Acceso Restringido", size=22, weight="bold"),
+                ft.Icon("lock", size=40, color="blue"),
+                ft.Text("Ingresar Clave", weight="bold"),
                 txt_clave,
-                ft.ElevatedButton("Entrar", on_click=entrar, width=200)
-            ], horizontal_alignment="center")
+                ft.ElevatedButton("Entrar", on_click=entrar)
+            ], horizontal_alignment="center"),
+            alignment=ft.alignment.top_center,
+            padding=20
         )
     )
 
 if __name__ == "__main__":
-    # Usamos ft.app directamente sin parámetros extra para que no tire error en Python 3.14
     ft.app(target=main, port=int(os.getenv("PORT", 8080)))
+    

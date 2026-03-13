@@ -6,33 +6,23 @@ def main(page: ft.Page):
     page.title = "Directorio Escolar - C. Dorrego"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.scroll = ft.ScrollMode.AUTO
-    page.padding = 20
     
     # --- CONFIGURACIÓN ---
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
     datos_escuelas = []
     
-    # Carga de datos
     if os.path.exists(archivo):
         with open(archivo, "r", encoding="utf-8", errors="ignore") as f:
             datos_escuelas = [linea.strip() for linea in f if linea.strip()]
 
     def normalizar(texto):
-        """Limpia el texto para búsquedas (ej: J.I. N2 -> jin2)"""
         if not texto: return ""
         return "".join(re.findall(r'[a-zA-Z0-9]+', texto)).lower()
 
-    # --- ELEMENTOS DE LA INTERFAZ ---
     lista_resultados = ft.ListView(expand=True, spacing=15)
 
-    def cambiar_tema(e):
-        page.theme_mode = ft.ThemeMode.DARK if page.theme_mode == ft.ThemeMode.LIGHT else ft.ThemeMode.LIGHT
-        btn_tema.icon = ft.Icons.LIGHT_MODE if page.theme_mode == ft.ThemeMode.DARK else ft.Icons.DARK_MODE
-        page.update()
-
     def filtrar_por_categoria(e):
-        """Al tocar un Chip, se escribe en el buscador y se filtra"""
         txt_busqueda.value = e.control.label
         actualizar_lista(None)
         page.update()
@@ -57,59 +47,51 @@ def main(page: ft.Page):
                         encontrado = True
                         tel_f = "".join(filter(str.isdigit, t))
                         url_mapa = f"https://www.google.com/maps/search/{n.replace(' ', '+')}+{l.replace(' ', '+')}+Coronel+Dorrego"
-                        texto_ws = f"📍 *{n}*\nLocalidad: {l}\nDirector: {d}\nTel: {t}"
+                        texto_ws = f"*{n}*\nLocalidad: {l}\nDirector: {d}\nTel: {t}"
                         url_ws = f"https://wa.me/?text={texto_ws.replace(' ', '%20')}"
 
+                        # Usamos colores básicos en texto para evitar errores de versión
                         lista_resultados.controls.append(
                             ft.Container(
-                                padding=20, border_radius=15, 
-                                bgcolor=ft.Colors.SURFACE_VARIANT,
-                                border=ft.Border.all(1, ft.Colors.OUTLINE_VARIANT),
-                                shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.BLACK12),
+                                padding=20, 
+                                border_radius=15, 
+                                bgcolor="grey100", # Color básico
+                                border=ft.border.all(1, "grey400"),
                                 content=ft.Column([
-                                    ft.Text(n, size=18, weight="bold", color=ft.Colors.PRIMARY),
-                                    ft.Text(f"📍 {l}", size=15),
-                                    ft.Text(f"👤 Dir: {d}", size=14, italic=True),
+                                    ft.Text(n, size=18, weight="bold", color="blue700"),
+                                    ft.Text(f"📍 {l}", size=15, color="black"),
+                                    ft.Text(f"👤 Dir: {d}", size=14, italic=True, color="black"),
                                     ft.Row([
-                                        ft.IconButton(ft.Icons.SHARE, icon_color=ft.Colors.BLUE_400, url=url_ws, tooltip="Compartir"),
-                                        ft.FilledButton("Llamar", icon=ft.Icons.PHONE, url=f"tel:{tel_f}", bgcolor=ft.Colors.GREEN_700),
-                                        ft.FilledButton("Mapa", icon=ft.Icons.MAP, url=url_mapa, bgcolor=ft.Colors.RED_700),
-                                    ], alignment=ft.MainAxisAlignment.END, spacing=5)
+                                        ft.IconButton(ft.icons.SHARE, icon_color="blue", url=url_ws),
+                                        ft.FilledButton("Llamar", icon=ft.icons.PHONE, url=f"tel:{tel_f}", bgcolor="green700"),
+                                        ft.FilledButton("Mapa", icon=ft.icons.MAP, url=url_mapa, bgcolor="red700"),
+                                    ], alignment=ft.MainAxisAlignment.END)
                                 ])
                             )
                         )
             if not encontrado:
-                lista_resultados.controls.append(ft.Text("No se encontraron escuelas.", color="red", italic=True))
+                lista_resultados.controls.append(ft.Text("No se encontraron escuelas.", color="red"))
         page.update()
 
-    btn_tema = ft.IconButton(ft.Icons.DARK_MODE, on_click=cambiar_tema)
-    
     txt_busqueda = ft.TextField(
         label="Buscar escuela o director...", 
         on_change=actualizar_lista, 
-        prefix_icon=ft.Icons.SEARCH,
+        prefix_icon=ft.icons.SEARCH,
         border_radius=15,
-        filled=True,
-        hint_text="Ej: ep1, jin2, ees1..."
+        filled=True
     )
 
-    # Chips con colores y corregidos
     chips_categorias = ft.Row([
-        ft.Chip(label="EP", on_click=filtrar_por_categoria, bgcolor=ft.Colors.BLUE_50, label_style=ft.TextStyle(color=ft.Colors.BLUE_800, weight="bold")),
-        ft.Chip(label="JI", on_click=filtrar_por_categoria, bgcolor=ft.Colors.GREEN_50, label_style=ft.TextStyle(color=ft.Colors.GREEN_800, weight="bold")),
-        ft.Chip(label="EES", on_click=filtrar_por_categoria, bgcolor=ft.Colors.ORANGE_50, label_style=ft.TextStyle(color=ft.Colors.ORANGE_800, weight="bold")),
-        ft.Chip(label="CEC", on_click=filtrar_por_categoria, bgcolor=ft.Colors.PURPLE_50, label_style=ft.TextStyle(color=ft.Colors.PURPLE_800, weight="bold")),
+        ft.Chip(label="EP", on_click=filtrar_por_categoria, bgcolor="blue50"),
+        ft.Chip(label="JI", on_click=filtrar_por_categoria, bgcolor="green50"),
+        ft.Chip(label="EES", on_click=filtrar_por_categoria, bgcolor="orange50"),
+        ft.Chip(label="CEC", on_click=filtrar_por_categoria, bgcolor="purple50"),
     ], wrap=True, alignment=ft.MainAxisAlignment.CENTER)
 
     vista_busqueda = ft.Column([
-        ft.Row([
-            ft.Column([
-                ft.Text("Directorio Escolar", size=26, weight="bold", color=ft.Colors.PRIMARY),
-                ft.Text("Consejo Escolar - Coronel Dorrego", size=13),
-            ], expand=True),
-            btn_tema
-        ]),
-        ft.Divider(height=10, color="transparent"),
+        ft.Text("Directorio Escolar", size=26, weight="bold", color="blue"),
+        ft.Text("Consejo Escolar - Coronel Dorrego", size=13),
+        ft.Divider(height=10),
         txt_busqueda,
         chips_categorias,
         lista_resultados
@@ -122,33 +104,21 @@ def main(page: ft.Page):
             page.update()
         else:
             txt_clave.error_text = "Clave incorrecta"
-            txt_clave.value = ""
-            page.update()
+            txt_clave.update()
 
-    txt_clave = ft.TextField(
-        label="Clave de Acceso", 
-        password=True, 
-        can_reveal_password=True, 
-        on_submit=verificar_clave, 
-        width=280,
-        text_align=ft.TextAlign.CENTER
-    )
+    txt_clave = ft.TextField(label="Clave de Acceso", password=True, width=280, text_align="center", on_submit=verificar_clave)
     
-    vista_login = ft.Container(
-        expand=True,
-        content=ft.Column([
-            ft.Icon(ft.Icons.LOCK_PERSON, size=80, color=ft.Colors.PRIMARY),
-            ft.Text("Acceso Restringido", size=22, weight="bold"),
-            txt_clave,
-            ft.FilledButton("Entrar", on_click=verificar_clave, width=200, style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10)))
-        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, alignment=ft.MainAxisAlignment.CENTER),
+    page.add(
+        ft.Container(
+            expand=True,
+            content=ft.Column([
+                ft.Icon(ft.icons.LOCK_PERSON, size=80, color="blue"),
+                ft.Text("Acceso Restringido", size=22, weight="bold"),
+                txt_clave,
+                ft.FilledButton("Entrar", on_click=verificar_clave, width=200)
+            ], horizontal_alignment="center", alignment="center")
+        )
     )
-
-    page.add(vista_login)
 
 if __name__ == "__main__":
-    ft.app(
-        target=main,
-        view=ft.AppView.WEB_BROWSER,
-        port=int(os.getenv("PORT", 8080))
-    )
+    ft.app(target=main, port=int(os.getenv("PORT", 8080)))

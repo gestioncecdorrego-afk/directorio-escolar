@@ -57,7 +57,7 @@ def main(page: ft.Page):
         page.update()
 
     txt_busqueda = ft.TextField(
-        label="Buscar institución o director...", 
+        label="Buscar...", 
         on_change=actualizar_lista, 
         border_radius=15, 
         prefix_icon="search",
@@ -69,7 +69,7 @@ def main(page: ft.Page):
             page.controls.clear()
             page.add(
                 ft.Text("Directorio Escolar", size=26, weight="bold", color="blue800"),
-                ft.Text("Consejo Escolar Coronel Dorrego", size=13, color="grey600"),
+                ft.Text("Consejo Escolar Coronel Dorrego", size=13),
                 ft.Divider(height=20),
                 txt_busqueda,
                 lista_resultados
@@ -88,15 +88,11 @@ def main(page: ft.Page):
                 ft.Icon("lock_outline", size=60, color="blue800"),
                 ft.Text("Acceso Restringido", size=22, weight="bold"),
                 txt_clave,
-                ft.FilledButton("Entrar", on_click=entrar, width=200)
+                ft.ElevatedButton("Entrar", on_click=entrar, width=200)
             ], horizontal_alignment="center")
         )
     )
 
 if __name__ == "__main__":
-    ft.app(
-        target=main, 
-        port=int(os.getenv("PORT", 8080)),
-        web_renderer="html" 
-    )
-    
+    # Usamos ft.app directamente sin parámetros extra para que no tire error en Python 3.14
+    ft.app(target=main, port=int(os.getenv("PORT", 8080)))

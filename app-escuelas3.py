@@ -5,10 +5,10 @@ import re
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
-    page.scroll = "auto"
-    # Esto ayuda a que no aparezca el espacio gris al inicio
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    # Quitamos alineaciones centradas que causan el error gris
+    page.vertical_alignment = "start"
+    page.horizontal_alignment = "start"
+    page.padding = 20
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -21,7 +21,7 @@ def main(page: ft.Page):
     def normalizar(t):
         return "".join(re.findall(r'[a-z0-9]', t.lower()))
 
-    lista_resultados = ft.ListView(expand=True, spacing=15, padding=10)
+    lista_resultados = ft.ListView(expand=True, spacing=15)
 
     def actualizar_lista(e):
         lista_resultados.controls.clear()
@@ -30,22 +30,21 @@ def main(page: ft.Page):
         
         if busqueda_original:
             for linea in datos_escuelas:
-                # Buscamos tanto en el texto normal como en el "limpio" (sin guiones)
                 if busqueda_original in linea.lower() or busqueda_limpia in normalizar(linea):
                     partes = linea.split("-")
                     if len(partes) >= 4:
-                        n, l, d, t = [p.strip() for p in partes[:4]]
-                        tel_limpio = "".join(filter(str.isdigit, t))
+                        inst, loc, dir, tel = [p.strip() for p in partes[:4]]
+                        tel_limpio = "".join(filter(str.isdigit, tel))
                         
                         lista_resultados.controls.append(
                             ft.Container(
                                 padding=15, bgcolor="#F0F4F8", border_radius=10,
                                 content=ft.Column([
-                                    ft.Text(n, size=18, weight="bold", color="blue"),
-                                    ft.Text(f"📍 {l} | 👤 {d}", size=14),
+                                    ft.Text(inst, size=18, weight="bold", color="blue"),
+                                    ft.Text(f"📍 {loc} | 👤 {dir}", size=14),
                                     ft.Row([
                                         ft.ElevatedButton("Llamar", icon="phone", bgcolor="green", color="white", url=f"tel:{tel_limpio}"),
-                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red", color="white", url=f"https://www.google.com/maps/search/{n.replace(' ', '+')}"),
+                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red", color="white", url=f"http://google.com/maps/search/{inst.replace(' ', '+')}+{loc.replace(' ', '+')}"),
                                     ], alignment="end")
                                 ])
                             )
@@ -56,25 +55,29 @@ def main(page: ft.Page):
 
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
-            page.vertical_alignment = ft.MainAxisAlignment.START # Cambiamos al entrar
             page.controls.clear()
             page.add(
-                ft.Text("Directorio Escolar", size=25, weight="bold", color="blue"),
+                ft.Text("Directorio Escolar", size=24, weight="bold", color="blue"),
+                ft.Text("Consejo Escolar Dorrego", size=12),
+                ft.Divider(),
                 txt_busqueda,
                 lista_resultados
             )
             page.update()
         else:
-            txt_clave.error_text = "Incorrecta"
+            txt_clave.error_text = "Clave incorrecta"
             page.update()
 
-    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=280, text_align="center")
+    # Login simple al principio de la página para que se vea en el celu
+    txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=300)
     
     page.add(
-        ft.Icon("lock", size=50, color="blue"),
-        ft.Text("Acceso Restringido", size=20, weight="bold"),
-        txt_clave,
-        ft.ElevatedButton("Entrar", on_click=entrar, width=200)
+        ft.Column([
+            ft.Icon("lock", size=40, color="blue"),
+            ft.Text("Ingresar Clave", size=18, weight="bold"),
+            txt_clave,
+            ft.ElevatedButton("Entrar", on_click=entrar, width=200)
+        ], horizontal_alignment="center")
     )
 
 if __name__ == "__main__":

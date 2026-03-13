@@ -5,8 +5,9 @@ import re
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.theme_mode = "light"
-    page.scroll = "auto"
-    page.padding = 15
+    # Forzamos a que la página no intente centrar nada verticalmente
+    page.vertical_alignment = ft.MainAxisAlignment.START
+    page.padding = 10
     
     CLAVE_ACCESO = "dorrego2026"
     archivo = "lista.txt"
@@ -19,7 +20,7 @@ def main(page: ft.Page):
     def normalizar(t):
         return "".join(re.findall(r'[a-z0-9]', t.lower()))
 
-    lista_resultados = ft.Column(spacing=15)
+    lista_resultados = ft.Column(spacing=15, scroll=ft.ScrollMode.ADAPTIVE)
 
     def actualizar_lista(e):
         lista_resultados.controls.clear()
@@ -43,7 +44,7 @@ def main(page: ft.Page):
                                     ft.Text(f"📞 {tel}", size=16, weight="bold"),
                                     ft.Row([
                                         ft.ElevatedButton("Llamar", icon="phone", bgcolor="green", color="white", url=f"tel:{tel_link}"),
-                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}"),
+                                        ft.ElevatedButton("Mapa", icon="map", bgcolor="red", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}")
                                     ], alignment="end")
                                 ])
                             )
@@ -55,16 +56,34 @@ def main(page: ft.Page):
     def entrar(e):
         if txt_clave.value == CLAVE_ACCESO:
             page.controls.clear()
-            page.add(ft.Text("Directorio Escolar", size=24, weight="bold"), txt_busqueda, lista_resultados)
+            page.add(
+                ft.Column([
+                    ft.Text("Directorio Escolar", size=24, weight="bold"),
+                    txt_busqueda,
+                    lista_resultados
+                ], scroll=ft.ScrollMode.ADAPTIVE)
+            )
             page.update()
         else:
             txt_clave.error_text = "Incorrecta"
             page.update()
 
     txt_clave = ft.TextField(label="Clave", password=True, on_submit=entrar, width=280)
-    page.add(ft.Column([ft.Icon("lock", size=50), txt_clave, ft.ElevatedButton("Entrar", on_click=entrar)], horizontal_alignment="center"))
+    
+    # EL TRUCO: Un contenedor con margen superior negativo o pegado arriba
+    page.add(
+        ft.Container(
+            content=ft.Column([
+                ft.Icon("lock", size=50, color="blue"),
+                ft.Text("Ingresar Clave", weight="bold"),
+                txt_clave,
+                ft.ElevatedButton("Entrar", on_click=entrar, width=200)
+            ], horizontal_alignment="center"),
+            padding=ft.padding.only(top=20), # Lo pega arriba
+            alignment=ft.alignment.top_center
+        )
+    )
 
 if __name__ == "__main__":
-    # Usamos "simple-http" que es el salvavidas para Python 3.14
+    # Sin parámetros extras para que Render no se queje
     ft.app(target=main, port=int(os.getenv("PORT", 8080)))
-

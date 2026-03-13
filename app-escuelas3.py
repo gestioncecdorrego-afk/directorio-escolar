@@ -66,4 +66,5 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     # Usamos "simple-http" que es el salvavidas para Python 3.14
-    ft.app(target=main, port=int(os.getenv("PORT", 8080)), web_renderer="simple-http")
+    ft.app(target=main, port=int(os.getenv("PORT", 8080)))
+

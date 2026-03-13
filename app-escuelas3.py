@@ -17,6 +17,7 @@ def main(page: ft.Page):
             datos_escuelas = [linea.strip() for linea in f if linea.strip()]
 
     def normalizar(t):
+        if not t: return ""
         return "".join(re.findall(r'[a-z0-9]', t.lower()))
 
     lista_resultados = ft.ListView(expand=True, spacing=15)
@@ -32,9 +33,8 @@ def main(page: ft.Page):
                     partes = linea.split("-")
                     if len(partes) >= 4:
                         inst, loc, dir, tel = [p.strip() for p in partes[:4]]
-                        tel_limpio = "".join(filter(str.isdigit, tel))
+                        tel_f = "".join(filter(str.isdigit, tel))
                         
-                        # Recuperamos el diseño de tarjetas con botones
                         lista_resultados.controls.append(
                             ft.Container(
                                 padding=15, 
@@ -47,9 +47,8 @@ def main(page: ft.Page):
                                     ft.Text(f"📍 {loc}", size=14, color="black"),
                                     ft.Text(f"👤 Dir: {dir}", size=13, italic=True, color="grey700"),
                                     ft.Row([
-                                        # Botones con colores como al principio
                                         ft.ElevatedButton("WhatsApp", icon="share", bgcolor="blue", color="white", url=f"https://wa.me/?text=Escuela:%20{inst}%0ADir:%20{dir}%0ATel:%20{tel}"),
-                                        ft.ElevatedButton("Llamar", icon="phone", bgcolor="green700", color="white", url=f"tel:{tel_limpio}"),
+                                        ft.ElevatedButton("Llamar", icon="phone", bgcolor="green700", color="white", url=f"tel:{tel_f}"),
                                         ft.ElevatedButton("Mapa", icon="map", bgcolor="red700", color="white", url=f"https://www.google.com/maps/search/{inst.replace(' ', '+')}+{loc.replace(' ', '+')}"),
                                     ], alignment="end", wrap=True)
                                 ])
@@ -80,7 +79,6 @@ def main(page: ft.Page):
             txt_clave.error_text = "Clave incorrecta"
             page.update()
 
-    # Login visualmente más limpio
     txt_clave = ft.TextField(label="Clave de Acceso", password=True, on_submit=entrar, width=280, text_align="center")
     
     page.add(
@@ -99,5 +97,6 @@ if __name__ == "__main__":
     ft.app(
         target=main, 
         port=int(os.getenv("PORT", 8080)),
-        web_renderer=ft.WebRenderer.HTML # Soluciona el problema de la pantalla gris en móviles
+        web_renderer="html" 
     )
+    

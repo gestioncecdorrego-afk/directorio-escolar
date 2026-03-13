@@ -92,12 +92,12 @@ def main(page: ft.Page):
     )
 
     chips_categorias = ft.Row([
-        ft.ActionChip(label=ft.Text("EP"), on_click=filtrar_por_categoria),
-        ft.ActionChip(label=ft.Text("JI"), on_click=filtrar_por_categoria),
-        ft.ActionChip(label=ft.Text("EES"), on_click=filtrar_por_categoria),
-        ft.ActionChip(label=ft.Text("CEC"), on_click=filtrar_por_categoria),
+        ft.Chip(label=ft.Text("EP"), on_click=filtrar_por_categoria),
+        ft.Chip(label=ft.Text("JI"), on_click=filtrar_por_categoria),
+        ft.Chip(label=ft.Text("EES"), on_click=filtrar_por_categoria),
+        ft.Chip(label=ft.Text("CEC"), on_click=filtrar_por_categoria),
     ], wrap=True, alignment=ft.MainAxisAlignment.CENTER)
-
+   
     vista_busqueda = ft.Column([
         ft.Row([
             ft.Column([
@@ -151,3 +151,4 @@ if __name__ == "__main__":
         view=ft.AppView.WEB_BROWSER,
         port=int(os.getenv("PORT", 8080))
     )
+

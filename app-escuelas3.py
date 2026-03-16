@@ -20,8 +20,13 @@ def cargar_escuelas():
                 })
     return escuelas
 
+# Normaliza texto para búsqueda (quita ., º, nº, no, espacios)
 def normalizar(texto):
-    return re.sub(r"[.\º]", "", texto.lower())
+    texto = texto.lower()
+    texto = re.sub(r"[.\º]", "", texto)
+    texto = texto.replace("nº", "").replace("no", "")
+    texto = texto.replace(" ", "")
+    return texto
 
 PASSWORD = "consejo2026"
 
@@ -95,12 +100,12 @@ def main(page: ft.Page):
                                     ),
                                     ft.Text("Mapa", size=12)
                                 ], alignment=ft.MainAxisAlignment.CENTER)
-                            ], spacing=30)
+                            ], spacing=40)
                         ]),
                         padding=15,
                         bgcolor=ft.Colors.LIGHT_BLUE_50,
-                        border_radius=10,
-                        shadow=ft.BoxShadow(blur_radius=8, color=ft.Colors.GREY)
+                        border_radius=12,
+                        shadow=ft.BoxShadow(blur_radius=10, color=ft.Colors.GREY)
                     )
                 )
                 lista.controls.append(tarjeta)

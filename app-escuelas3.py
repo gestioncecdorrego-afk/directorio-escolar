@@ -7,9 +7,10 @@ def cargar_escuelas():
         for linea in f:
             partes = linea.strip().split("-")
             if len(partes) >= 4:
-                telefono = partes[3].strip().rstrip("-")
-                # quitar el "15" si aparece después del código de área
-                telefono = telefono.replace("-15-", "-")
+                telefono = partes[3].strip()
+                telefono = telefono.rstrip("-")           # quita guiones finales
+                telefono = telefono.replace("-15-", "-")  # elimina el “15” intermedio
+                telefono = telefono.replace("-", "")      # elimina todos los guiones
                 escuelas.append({
                     "nombre": partes[0].strip(),
                     "localidad": partes[1].strip(),
@@ -68,13 +69,21 @@ def main(page: ft.Page):
                             ft.Row([
                                 ft.IconButton(
                                     icon=ft.Icons.PHONE,
-                                    icon_color=ft.Colors.GREEN,
+                                    icon_color=ft.Colors.WHITE,
+                                    style=ft.ButtonStyle(
+                                        bgcolor=ft.Colors.GREEN,
+                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                    ),
                                     url=f"tel:{esc['telefono']}"
                                 ),
                                 ft.IconButton(
-                                    icon=ft.Icons.MAP,
-                                    icon_color=ft.Colors.BLUE,
-                                    url=f"https://www.google.com/maps/search/{esc['localidad']}"
+                                    icon=ft.Icons.LOCATION_ON,
+                                    icon_color=ft.Colors.WHITE,
+                                    style=ft.ButtonStyle(
+                                        bgcolor=ft.Colors.RED,
+                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                    ),
+                                    url=f"https://www.google.com/maps/search/{esc['nombre']} {esc['localidad']}"
                                 )
                             ])
                         ]),

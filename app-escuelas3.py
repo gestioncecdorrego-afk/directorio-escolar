@@ -2,7 +2,7 @@ import flet as ft
 import os
 
 def main(page: ft.Page):
-    # Configuración básica para evitar errores de visualización
+    # Configuración de página estable
     page.title = "Directorio Escolar"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.AUTO
@@ -10,24 +10,33 @@ def main(page: ft.Page):
     def entrar(e):
         page.clean()
         page.add(
-            ft.Text("¡Bienvenido al sistema!", size=25),
-            ft.ElevatedButton("Volver", on_click=lambda _: main(page))
+            ft.Text("Panel de Búsqueda", size=25, weight=ft.FontWeight.BOLD),
+            ft.Text("Aquí irá la lista de escuelas...", size=16),
+            ft.ElevatedButton("Volver al Inicio", on_click=lambda _: main(page))
         )
 
-    # USAMOS ELEVATEDBUTTON: Es el que NO falla con el argumento 'text'
+    # Título principal
+    titulo = ft.Text(
+        "Consejo Escolar", 
+        size=30, 
+        weight=ft.FontWeight.BOLD,
+        color=ft.Colors.BLUE_800
+    )
+
+    # BOTÓN ESTABLE: ElevatedButton siempre acepta 'text'
     btn_entrar = ft.ElevatedButton(
         text="Entrar al Buscador",
         on_click=entrar,
         width=250
     )
 
-    # Contenedor con la sintaxis de Clases (Mayúsculas) que pide la versión 0.82.2
+    # Contenedor usando Clases (Mayúsculas) para evitar errores de atributo
     inicio = ft.Container(
         content=ft.Column(
             [
-                ft.Text("Consejo Escolar", size=30, weight=ft.FontWeight.BOLD),
-                ft.Text("Sistema de búsqueda", size=16),
-                ft.Divider(height=20),
+                titulo,
+                ft.Text("Sistema de búsqueda de instituciones", size=16),
+                ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
                 btn_entrar,
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -39,8 +48,8 @@ def main(page: ft.Page):
     page.add(inicio)
 
 if __name__ == "__main__":
-    # Render necesita el puerto de la variable de entorno
-    port_env = os.getenv("PORT", "8080")
+    # Render configuración de puerto
+    puerto = int(os.getenv("PORT", 8080))
     
-    # IMPORTANTE: Usamos 0.0.0.0 para que Render pueda "ver" la app desde afuera
-    ft.app(target=main, port=int(port_env), host="0.0.0.0")
+    # Usamos host="0.0.0.0" para que Render detecte la app correctamente
+    ft.app(target=main, port=puerto, host="0.0.0.0")

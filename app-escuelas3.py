@@ -1,36 +1,67 @@
 import flet as ft
 import os
+import csv
+
+# Función para cargar datos desde un CSV
+def cargar_escuelas():
+    escuelas = []
+    try:
+        with open("escuelas.csv", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                escuelas.append(row)
+    except FileNotFoundError:
+        print("Archivo 'escuelas.csv' no encontrado.")
+    return escuelas
 
 def main(page: ft.Page):
-    # Configuración de página estable
     page.title = "Directorio Escolar"
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.AUTO
 
+    escuelas = cargar_escuelas()
+
     def entrar(e):
         page.clean()
+
+        buscador = ft.TextField(label="Buscar escuela", width=300)
+
+        lista = ft.Column()
+
+        def buscar(e):
+            query = buscador.value.lower()
+            resultados = [
+                esc for esc in escuelas
+                if query in esc["nombre"].lower()
+                or query in esc["director"].lower()
+            ]
+            lista.controls = [
+                ft.Text(f"{esc['nombre']} - {esc['director']} - {esc['direccion']} - {esc['telefono']}")
+                for esc in resultados
+            ]
+            page.update()
+
         page.add(
             ft.Text("Panel de Búsqueda", size=25, weight=ft.FontWeight.BOLD),
-            ft.Text("Aquí irá la lista de escuelas...", size=16),
-            ft.ElevatedButton("Volver al Inicio", on_click=lambda _: main(page))
+            buscador,
+            ft.ElevatedButton(content=ft.Text("Buscar"), on_click=buscar),
+            lista,
+            ft.ElevatedButton(content=ft.Text("Volver al Inicio"), on_click=lambda _: main(page))
         )
 
-    # Título principal
     titulo = ft.Text(
-        "Consejo Escolar", 
-        size=30, 
+        "Consejo Escolar",
+        size=30,
         weight=ft.FontWeight.BOLD,
         color=ft.Colors.BLUE_800
     )
 
-    # BOTÓN ESTABLE: ElevatedButton siempre acepta 'text'
     btn_entrar = ft.ElevatedButton(
-        text="Entrar al Buscador",
+        content=ft.Text("Entrar al Buscador"),
         on_click=entrar,
         width=250
     )
 
-    # Contenedor usando Clases (Mayúsculas) para evitar errores de atributo
     inicio = ft.Container(
         content=ft.Column(
             [
@@ -48,8 +79,5 @@ def main(page: ft.Page):
     page.add(inicio)
 
 if __name__ == "__main__":
-    # Render configuración de puerto
     puerto = int(os.getenv("PORT", 8080))
-    
-    # Usamos host="0.0.0.0" para que Render detecte la app correctamente
     ft.app(target=main, port=puerto, host="0.0.0.0")

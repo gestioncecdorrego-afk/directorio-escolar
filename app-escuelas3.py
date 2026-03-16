@@ -1,18 +1,23 @@
 import flet as ft
 import os
-import csv
 
-# Función para cargar datos desde un CSV
+# Función para cargar datos desde lista.txt
 def cargar_escuelas():
     escuelas = []
-    try:
-        with open("escuelas.csv", newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                escuelas.append(row)
-    except FileNotFoundError:
-        print("Archivo 'escuelas.csv' no encontrado.")
+    with open("lista.txt", encoding="utf-8") as f:
+        for linea in f:
+            partes = linea.strip().split("-")
+            if len(partes) >= 4:
+                escuelas.append({
+                    "nombre": partes[0].strip(),
+                    "localidad": partes[1].strip(),
+                    "director": partes[2].strip(),
+                    "telefono": partes[3].strip()
+                })
     return escuelas
+
+# Contraseña de acceso
+PASSWORD = "consejo2026"
 
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
@@ -21,11 +26,28 @@ def main(page: ft.Page):
 
     escuelas = cargar_escuelas()
 
-    def entrar(e):
+    # --- Pantalla de login ---
+    def login_screen():
         page.clean()
+        clave = ft.TextField(label="Ingrese contraseña", password=True, can_reveal_password=True, width=300)
 
-        buscador = ft.TextField(label="Buscar escuela", width=300)
+        def validar(e):
+            if clave.value == PASSWORD:
+                entrar()
+            else:
+                page.snack_bar = ft.SnackBar(ft.Text("Contraseña incorrecta"), open=True)
+                page.update()
 
+        page.add(
+            ft.Text("Acceso al Directorio Escolar", size=25, weight=ft.FontWeight.BOLD),
+            clave,
+            ft.ElevatedButton(content=ft.Text("Ingresar"), on_click=validar)
+        )
+
+    # --- Pantalla de búsqueda ---
+    def entrar():
+        page.clean()
+        buscador = ft.TextField(label="Buscar escuela / director / localidad / teléfono", width=400)
         lista = ft.Column()
 
         def buscar(e):
@@ -33,10 +55,12 @@ def main(page: ft.Page):
             resultados = [
                 esc for esc in escuelas
                 if query in esc["nombre"].lower()
+                or query in esc["localidad"].lower()
                 or query in esc["director"].lower()
+                or query in esc["telefono"].lower()
             ]
             lista.controls = [
-                ft.Text(f"{esc['nombre']} - {esc['director']} - {esc['direccion']} - {esc['telefono']}")
+                ft.Text(f"{esc['nombre']} - {esc['localidad']} - {esc['director']} - {esc['telefono']}")
                 for esc in resultados
             ]
             page.update()
@@ -46,38 +70,12 @@ def main(page: ft.Page):
             buscador,
             ft.ElevatedButton(content=ft.Text("Buscar"), on_click=buscar),
             lista,
-            ft.ElevatedButton(content=ft.Text("Volver al Inicio"), on_click=lambda _: main(page))
+            ft.ElevatedButton(content=ft.Text("Cerrar sesión"), on_click=lambda _: login_screen())
         )
 
-    titulo = ft.Text(
-        "Consejo Escolar",
-        size=30,
-        weight=ft.FontWeight.BOLD,
-        color=ft.Colors.BLUE_800
-    )
-
-    btn_entrar = ft.ElevatedButton(
-        content=ft.Text("Entrar al Buscador"),
-        on_click=entrar,
-        width=250
-    )
-
-    inicio = ft.Container(
-        content=ft.Column(
-            [
-                titulo,
-                ft.Text("Sistema de búsqueda de instituciones", size=16),
-                ft.Divider(height=20, color=ft.Colors.TRANSPARENT),
-                btn_entrar,
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        ),
-        padding=ft.Padding.only(top=50),
-        alignment=ft.Alignment.TOP_CENTER
-    )
-
-    page.add(inicio)
+    # --- Inicio: muestra login ---
+    login_screen()
 
 if __name__ == "__main__":
     puerto = int(os.getenv("PORT", 8080))
-    ft.app(target=main, port=puerto, host="0.0.0.0")
+    ft.run(target=main, port=puerto, host="0.0.0.0")

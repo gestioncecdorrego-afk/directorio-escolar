@@ -78,4 +78,4 @@ def main(page: ft.Page):
 
 if __name__ == "__main__":
     puerto = int(os.getenv("PORT", 8080))
-    ft.run(target=main, port=puerto, host="0.0.0.0")
+    ft.run(main, port=puerto, host="0.0.0.0")

@@ -20,7 +20,6 @@ def cargar_escuelas():
                 })
     return escuelas
 
-# Normaliza texto para búsqueda (quita ., º, nº, no, espacios)
 def normalizar(texto):
     texto = texto.lower()
     texto = re.sub(r"[.\º]", "", texto)
@@ -33,6 +32,7 @@ PASSWORD = "consejo2026"
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
     page.scroll = ft.ScrollMode.AUTO
+    page.theme_mode = ft.ThemeMode.LIGHT
 
     escuelas = cargar_escuelas()
 
@@ -48,14 +48,24 @@ def main(page: ft.Page):
                 page.update()
 
         page.add(
-            ft.Text("Acceso al Directorio Escolar", size=25, weight=ft.FontWeight.BOLD),
-            clave,
-            ft.Button(content=ft.Text("Ingresar"), on_click=validar)
+            ft.Container(
+                content=ft.Column([
+                    ft.Text("Acceso al Directorio Escolar", size=25, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE),
+                    clave,
+                    ft.Button(content=ft.Text("Ingresar"), on_click=validar,
+                              style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE))
+                ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=20),
+                padding=30,
+                bgcolor=ft.Colors.LIGHT_BLUE_50,
+                border_radius=12,
+                shadow=ft.BoxShadow(blur_radius=8, color=ft.Colors.GREY)
+            )
         )
 
     def entrar():
         page.clean()
-        buscador = ft.TextField(label="Buscar escuela / director / localidad / teléfono", width=400)
+        buscador = ft.TextField(label="Buscar escuela / director / localidad / teléfono", width=400,
+                                bgcolor=ft.Colors.LIGHT_BLUE_100, border_radius=8)
         lista = ft.Column()
 
         def buscar(e):
@@ -72,8 +82,8 @@ def main(page: ft.Page):
                 tarjeta = ft.Card(
                     content=ft.Container(
                         content=ft.Column([
-                            ft.Text(esc["nombre"], size=20, weight=ft.FontWeight.BOLD),
-                            ft.Text(f"Localidad: {esc['localidad']}"),
+                            ft.Text(esc["nombre"], size=20),
+                            ft.Text(f"Localidad: {esc['localidad']}", weight=ft.FontWeight.BOLD),
                             ft.Text(f"Director/a: {esc['director']}", weight=ft.FontWeight.BOLD),
                             ft.Row([
                                 ft.Column([
@@ -114,10 +124,11 @@ def main(page: ft.Page):
         buscador.on_change = buscar
 
         page.add(
-            ft.Text("Panel de Búsqueda", size=25, weight=ft.FontWeight.BOLD),
+            ft.Text("Panel de Búsqueda", size=25, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE),
             buscador,
             lista,
-            ft.Button(content=ft.Text("Cerrar sesión"), on_click=lambda _: login_screen())
+            ft.Button(content=ft.Text("Cerrar sesión"), on_click=lambda _: login_screen(),
+                      style=ft.ButtonStyle(bgcolor=ft.Colors.RED, color=ft.Colors.WHITE))
         )
 
     login_screen()

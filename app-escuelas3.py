@@ -77,7 +77,8 @@ def main(page: ft.Page):
                                     url=f"https://www.google.com/maps/search/{esc['localidad']}"
                                 )
                             ])
-                        ])
+                        ]),
+                        padding=10
                     )
                 )
                 lista.controls.append(tarjeta)

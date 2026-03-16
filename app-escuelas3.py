@@ -1,5 +1,6 @@
 import flet as ft
 import os
+import re
 
 def cargar_escuelas():
     escuelas = []
@@ -18,6 +19,10 @@ def cargar_escuelas():
                     "telefono": telefono
                 })
     return escuelas
+
+# Normaliza texto para búsqueda (quita ., º y pasa a minúsculas)
+def normalizar(texto):
+    return re.sub(r"[.\º]", "", texto.lower())
 
 PASSWORD = "consejo2026"
 
@@ -50,13 +55,13 @@ def main(page: ft.Page):
         lista = ft.Column()
 
         def buscar(e):
-            query = buscador.value.lower()
+            query = normalizar(buscador.value)
             resultados = [
                 esc for esc in escuelas
-                if query in esc["nombre"].lower()
-                or query in esc["localidad"].lower()
-                or query in esc["director"].lower()
-                or query in esc["telefono"].lower()
+                if query in normalizar(esc["nombre"])
+                or query in normalizar(esc["localidad"])
+                or query in normalizar(esc["director"])
+                or query in normalizar(esc["telefono"])
             ]
             lista.controls = []
             for esc in resultados:
@@ -87,7 +92,10 @@ def main(page: ft.Page):
                                 )
                             ])
                         ]),
-                        padding=10
+                        padding=15,
+                        bgcolor=ft.Colors.LIGHT_BLUE_50,
+                        border_radius=10,
+                        shadow=ft.BoxShadow(blur_radius=8, color=ft.Colors.GREY)
                     )
                 )
                 lista.controls.append(tarjeta)

@@ -22,7 +22,6 @@ PASSWORD = "consejo2026"
 
 def main(page: ft.Page):
     page.title = "Directorio Escolar"
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.scroll = ft.ScrollMode.AUTO
 
     escuelas = cargar_escuelas()
@@ -41,7 +40,7 @@ def main(page: ft.Page):
         page.add(
             ft.Text("Acceso al Directorio Escolar", size=25, weight=ft.FontWeight.BOLD),
             clave,
-            ft.ElevatedButton(content=ft.Text("Ingresar"), on_click=validar)
+            ft.Button(content=ft.Text("Ingresar"), on_click=validar)
         )
 
     def entrar():
@@ -60,20 +59,28 @@ def main(page: ft.Page):
             ]
             lista.controls = []
             for esc in resultados:
-                fila = ft.Row([
-                    ft.Text(f"{esc['nombre']} - {esc['localidad']} - {esc['director']} - {esc['telefono']}"),
-                    ft.ElevatedButton(
-                        content=ft.Text("Llamar"),
-                        style=ft.ButtonStyle(bgcolor=ft.Colors.GREEN, color=ft.Colors.WHITE),
-                        url=f"tel:{esc['telefono']}"
-                    ),
-                    ft.ElevatedButton(
-                        content=ft.Text("Mapa"),
-                        style=ft.ButtonStyle(bgcolor=ft.Colors.BLUE, color=ft.Colors.WHITE),
-                        url=f"https://www.google.com/maps/search/{esc['localidad']}"
+                tarjeta = ft.Card(
+                    content=ft.Container(
+                        content=ft.Column([
+                            ft.Text(esc["nombre"], size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text(f"Localidad: {esc['localidad']}"),
+                            ft.Text(f"Director/a: {esc['director']}"),
+                            ft.Row([
+                                ft.IconButton(
+                                    icon=ft.Icons.PHONE,
+                                    icon_color=ft.Colors.GREEN,
+                                    url=f"tel:{esc['telefono']}"
+                                ),
+                                ft.IconButton(
+                                    icon=ft.Icons.MAP,
+                                    icon_color=ft.Colors.BLUE,
+                                    url=f"https://www.google.com/maps/search/{esc['localidad']}"
+                                )
+                            ])
+                        ])
                     )
-                ])
-                lista.controls.append(fila)
+                )
+                lista.controls.append(tarjeta)
             page.update()
 
         buscador.on_change = buscar
@@ -82,7 +89,7 @@ def main(page: ft.Page):
             ft.Text("Panel de Búsqueda", size=25, weight=ft.FontWeight.BOLD),
             buscador,
             lista,
-            ft.ElevatedButton(content=ft.Text("Cerrar sesión"), on_click=lambda _: login_screen())
+            ft.Button(content=ft.Text("Cerrar sesión"), on_click=lambda _: login_screen())
         )
 
     login_screen()

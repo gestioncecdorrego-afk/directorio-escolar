@@ -9,9 +9,9 @@ def cargar_escuelas():
             partes = linea.strip().split("-")
             if len(partes) >= 4:
                 telefono = partes[3].strip()
-                telefono = telefono.rstrip("-")           # quita guiones finales
-                telefono = telefono.replace("-15-", "-")  # elimina el “15” intermedio
-                telefono = telefono.replace("-", "")      # elimina todos los guiones
+                telefono = telefono.rstrip("-")
+                telefono = telefono.replace("-15-", "-")
+                telefono = telefono.replace("-", "")
                 escuelas.append({
                     "nombre": partes[0].strip(),
                     "localidad": partes[1].strip(),
@@ -20,7 +20,6 @@ def cargar_escuelas():
                 })
     return escuelas
 
-# Normaliza texto para búsqueda (quita ., º y pasa a minúsculas)
 def normalizar(texto):
     return re.sub(r"[.\º]", "", texto.lower())
 
@@ -68,29 +67,35 @@ def main(page: ft.Page):
                 tarjeta = ft.Card(
                     content=ft.Container(
                         content=ft.Column([
-                            ft.Text(esc["nombre"], size=18, weight=ft.FontWeight.BOLD),
+                            ft.Text(esc["nombre"], size=20, weight=ft.FontWeight.BOLD),
                             ft.Text(f"Localidad: {esc['localidad']}"),
-                            ft.Text(f"Director/a: {esc['director']}"),
+                            ft.Text(f"Director/a: {esc['director']}", weight=ft.FontWeight.BOLD),
                             ft.Row([
-                                ft.IconButton(
-                                    icon=ft.Icons.PHONE,
-                                    icon_color=ft.Colors.WHITE,
-                                    style=ft.ButtonStyle(
-                                        bgcolor=ft.Colors.GREEN,
-                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                ft.Column([
+                                    ft.IconButton(
+                                        icon=ft.Icons.PHONE,
+                                        icon_color=ft.Colors.WHITE,
+                                        style=ft.ButtonStyle(
+                                            bgcolor=ft.Colors.GREEN,
+                                            shape=ft.RoundedRectangleBorder(radius=8)
+                                        ),
+                                        url=f"tel:{esc['telefono']}"
                                     ),
-                                    url=f"tel:{esc['telefono']}"
-                                ),
-                                ft.IconButton(
-                                    icon=ft.Icons.LOCATION_ON,
-                                    icon_color=ft.Colors.WHITE,
-                                    style=ft.ButtonStyle(
-                                        bgcolor=ft.Colors.RED,
-                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                    ft.Text("Llamar", size=12)
+                                ], alignment=ft.MainAxisAlignment.CENTER),
+                                ft.Column([
+                                    ft.IconButton(
+                                        icon=ft.Icons.LOCATION_ON,
+                                        icon_color=ft.Colors.WHITE,
+                                        style=ft.ButtonStyle(
+                                            bgcolor=ft.Colors.RED,
+                                            shape=ft.RoundedRectangleBorder(radius=8)
+                                        ),
+                                        url=f"https://www.google.com/maps/search/{esc['nombre']} {esc['localidad']}"
                                     ),
-                                    url=f"https://www.google.com/maps/search/{esc['nombre']} {esc['localidad']}"
-                                )
-                            ])
+                                    ft.Text("Mapa", size=12)
+                                ], alignment=ft.MainAxisAlignment.CENTER)
+                            ], spacing=30)
                         ]),
                         padding=15,
                         bgcolor=ft.Colors.LIGHT_BLUE_50,
